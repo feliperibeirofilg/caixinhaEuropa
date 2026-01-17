@@ -1,0 +1,76 @@
+# version: '3'
+services:
+    # Aplicação Laravel (PHP)
+    cop:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: caixinhaeuropa-app
+        container_name: caixinhaeuropa-cop-1
+        restart: unless-stopped
+        working_dir: /var/www/
+        user: "1000:1000"
+        volumes:
+            - ./:/var/www
+        networks:
+            - cop
+
+    # Servidor Web (Nginx)
+    nginx:
+        image: nginx:alpine
+        container_name: caixinhaeuropa-nginx-1
+        restart: unless-stopped
+        ports:
+            - "1001:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/:/etc/nginx/conf.d/
+        networks:
+            - cop
+        depends_on:
+            - cop
+
+    # Banco de Dados (MySQL)
+    db:
+        image: mysql:5.7
+        container_name: caixinhaeuropa-db-1
+        restart: unless-stopped
+        command: --innodb-use-native-aio=0
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE:-cop}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+            # MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+            # MYSQL_USER: ${DB_USERNAME:-root}
+        volumes:
+            - ./.docker/mysql/dbdata:/var/lib/mysql
+        ports:
+            - "1003:3306"
+        networks:
+            - cop
+
+    # PhpMyAdmin
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: caixinhaeuropa-pma
+        links:
+            - db
+        restart: always
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+        ports:
+            - "1002:80"
+        networks:
+            - cop
+
+    # Redis
+    redis:
+        image: redis:alpine
+        container_name: caixinhaeuropa-redis-1
+        networks:
+            - cop
+
+networks:
+    cop:
+        driver: bridge
