@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class DepositoIniciaisSeeder extends Seeder
+class DepositosIniciaisSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -31,6 +31,7 @@ class DepositoIniciaisSeeder extends Seeder
             for($i=0; $i<$quantidade; $i++){
                 $dadosParaInserir[] = [
                     'valor' => $valor,
+                    'pago' => false,
                     'created_at' => $agora,
                     'updated_at' => $agora,
                 ];

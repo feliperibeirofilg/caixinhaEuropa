@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ControleDepositoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -13,10 +14,13 @@ Route::post('usuario/criar-usuario', [UsuarioController::class, 'criarUsuario'])
 Route::get('usuario/login', [UsuarioController::class, 'login'])->name('login');
 Route::post('usuario/login', [UsuarioController::class, 'autenticar'])->name('autenticar');
 
-// Dashboard - área protegida por Middleware de autenticação
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
+Route::get('dashboard', [ControleDepositoController::class, 'totalDepositos'])
+->middleware('auth')
+->name('dashboard');
+// Rotas para os depositos
+Route::post('/depositos/pagar/{valor}', [ControleDepositoController::class, 'pagarPorValor'])->name('depositos.pagar');
+
+
 
 // Rota para deslogar o usuario
 Route::post('/logout', function () {
@@ -25,5 +29,9 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
+
+
+//Conexão com o bot do telegram
+// Route::post('/telegram/webhook', [App\Http\Controllers\TelegramController::class, 'handle']);
 
 

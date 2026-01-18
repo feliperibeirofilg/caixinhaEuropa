@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="login-dark">
-        <form method="post">
+        <form method="post" action="{{ route('autenticar') }}">
             @csrf
             <h2 class="sr-only">Login Form</h2>
             <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>

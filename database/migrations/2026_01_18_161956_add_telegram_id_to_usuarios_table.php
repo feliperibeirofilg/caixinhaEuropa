@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('depositos', function (Blueprint $table) {
-            $table->id();
-            $table->decimal('valor', 10 , 2);
-            $table->boolean('pago')->default(0);
-            $table->timestamps();
+        Schema::table('usuarios', function (Blueprint $table) {
+            $table->string('telegram_id')->nullable();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('depositos');
+        Schema::table('usuarios', function (Blueprint $table) {
+            //
+        });
     }
 };

@@ -9,12 +9,21 @@ class Depositos extends Model
 {
     use HasFactory;
 
-    public function quantidadeDeposito(){
+    protected $fillable = [
+        'valor',
+        'pago'
+    ];
 
-        $depositos = "SELECT valor, count(*) as quantidade 
-                        FROM depositos 
-                        GROUP BY valor;";
+    public function depositosFeitos(){
 
-        return \DB::select($depositos);
+        $sql = "SELECT 
+                a.valor, 
+                SUM(CASE WHEN a.pago = 0 THEN 1 ELSE 0 END) as pendentes,
+                SUM(CASE WHEN a.pago = 1 THEN 1 ELSE 0 END) as feitos
+            FROM depositos a
+            GROUP BY a.valor
+            ORDER BY a.valor DESC";
+
+        return \DB::select($sql);
     }
 }
