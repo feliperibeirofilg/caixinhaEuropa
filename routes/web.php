@@ -4,7 +4,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ControleDepositoController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('usuario.login');
 });
 
 Route::get('usuario/criar-usuario', [UsuarioController::class, 'formCriarUsuario'])->name('formulario');
