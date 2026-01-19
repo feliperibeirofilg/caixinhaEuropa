@@ -33,3 +33,7 @@ RUN useradd -u 1000 -ms /bin/bash -G www-data,root felipe
 
 # 6. Definir diretório de trabalho
 WORKDIR /var/www
+
+EXPOSE 8080
+
+CMD php artisan serve --host=0.0.0.0 --port=8080
