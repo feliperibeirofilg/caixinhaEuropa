@@ -18,9 +18,11 @@ Route::get('dashboard', [ControleDepositoController::class, 'totalDepositos'])
 ->middleware('auth')
 ->name('dashboard');
 // Rotas para os depositos
-Route::post('/depositos/pagar/{valor}', [ControleDepositoController::class, 'pagarPorValor'])->name('depositos.pagar');
-
-
+Route::post('/depositos/pagar/{valor}', [ControleDepositoController::class, 'pagarPorValor'])->name('depositos.pagar')
+->middleware('auth');
+//Rota para excluir deposito
+Route::delete('/depositos/excluir/{valor}', [ControleDepositoController::class, 'excluirPorValor'])->name('depositos.excluir')
+->middleware('auth');
 
 // Rota para deslogar o usuario
 Route::post('/logout', function () {

@@ -20,9 +20,9 @@ class Depositos extends Model
                 a.valor, 
                 SUM(CASE WHEN a.pago = 0 THEN 1 ELSE 0 END) as pendentes,
                 SUM(CASE WHEN a.pago = 1 THEN 1 ELSE 0 END) as feitos
-            FROM depositos a
-            GROUP BY a.valor
-            ORDER BY a.valor DESC";
+                FROM depositos a
+                GROUP BY a.valor
+                ORDER BY a.valor DESC";
 
         return \DB::select($sql);
     }

@@ -34,4 +34,16 @@ class ControleDepositoController extends Controller
         }
         return back()->with('error', 'Depósito de R$' . $valor . ' não encontrado.');
     }
+
+    public function excluirPorValor($valor){
+
+        $deposito = Depositos::where('valor', $valor)->first();
+        $Faltam = Depositos::where('pago', 0)->sum('valor');
+
+        if($deposito){
+            $deposito->delete();
+            return back()->with('success', 'Depósito de R$' . $valor . ' excluído com sucesso! Faltam R$' . $Faltam . ' para completar a meta.');
+        }
+        return back()->with('error', 'Depósito de R$' . $valor . ' não encontrado.');
+    }
 }

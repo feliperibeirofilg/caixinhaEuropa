@@ -70,3 +70,61 @@
   transform:translateY(1px);
 }
 
+/* Navbar Container */
+nav.custom-navbar {
+    width: 100%;
+    background: rgba(4, 97, 0, 0.986); /* Transparência bonita */
+    backdrop-filter: blur(10px); /* Efeito de vidro (Glassmorphism) */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between; /* Separa Logo dos Links */
+    align-items: center;
+    height: 60px; /* Altura fixa para ficar fina */
+    position: fixed; /* Fica presa no topo */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* Logo / Nome do App */
+.navbar-brand {
+    font-family: "Open Sans", sans-serif;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+/* Lista de Links */
+.navbar-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-links li {
+    margin-left: 20px;
+}
+
+.navbar-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+    color: #fff;
+}
+
+/* Ajuste para o conteúdo não ficar escondido atrás da navbar fixa */
+body {
+    padding-top: 70px; 
+}
