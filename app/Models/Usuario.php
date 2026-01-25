@@ -24,8 +24,13 @@ class Usuario extends Authenticatable
         'password',
     ];
 
-    // public function ():HasMany{
-    //     return $this->hasMany()
-    //     }
-        
+    public function depositos(): HasMany
+    {
+        return $this->hasMany(Depositos::class, 'usuario_id');
+    }
+
+    public function caixinha()
+    {
+        return $this->belongsTo(Caixinha::class, 'caixinha_id');
+    }
 }

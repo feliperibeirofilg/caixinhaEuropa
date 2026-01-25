@@ -33,7 +33,7 @@ class UsuarioController extends Controller
         'password' => Hash::make($request->password),
     ]);
 
-    return view('usuario.login');
+    return redirect()->route('login');
     }
 
     public function login(Request $request){

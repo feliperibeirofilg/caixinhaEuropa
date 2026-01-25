@@ -14,7 +14,7 @@ class DepositosIniciaisSeeder extends Seeder
      */
     public function run(): void
     {
-        $listaDeDepositos = [
+        $listaDeDepositos10000 = [
             500.00 => 4,
             200.00 => 13,
             100.00 => 35,
@@ -23,23 +23,40 @@ class DepositosIniciaisSeeder extends Seeder
             5.00 => 36,
         ];
 
-        $dadosParaInserir = [];
+        $listaDeDepositos1000 = [
+            50.00 => 4,
+            20.00 => 15,
+            10.00 => 30,
+            5.00 => 30,
+            2.00 => 25,
+            ];
+
+        $listaDeDepositos5000 = [
+            200.00 => 5,
+            100.00 => 15,
+            50.00 => 30,
+            20.00 => 30,
+            10.00 => 30,
+            5.00 => 20,
+        ];
+
         $agora = Carbon::now();
 
-        foreach($listaDeDepositos as $valor => $quantidade){
+        $dadosParaInserir = [
+            ['nome' => 'Iniciante R$ 1000,00', 
+            'meta_valor' => 1000.00, 
+            'quantidade' => json_encode($listaDeDepositos10000)],
+            ['nome' => 'Média R$ 5000,00',
+             'meta_valor' => 5000.00, 
+             'quantidade' => json_encode($listaDeDepositos5000)],
+            ['nome' => 'Difícil R$ 10000,00',
+             'meta_valor' => 10000.00, 
+             'quantidade' => json_encode($listaDeDepositos1000)],
+        ];
+       
 
-            for($i=0; $i<$quantidade; $i++){
-                $dadosParaInserir[] = [
-                    'valor' => $valor,
-                    'pago' => false,
-                    'created_at' => $agora,
-                    'updated_at' => $agora,
-                ];
-            }
-        }
+        DB::table('caixinhas')->insert($dadosParaInserir);
 
-        DB::table('depositos')->insert($dadosParaInserir);
-
-        echo "Sucesso! 200 depositos inseridos.";
+        echo "Sucesso! Caixinhas adicionadas.";
     }
 }

@@ -9,21 +9,24 @@ class ControleDepositoController extends Controller
 {
     
     public function totalDepositos(){
+        $usuario_id = auth()->id();
 
         $depositosModel = new Depositos();
-        $listaUnificada = $depositosModel->depositosFeitos();
+        $listaUnificada = $depositosModel->depositosFeitos($usuario_id);
         
-        $valorDepositado = Depositos::where('pago', 1)->sum('valor');
+        $valorDepositado = Depositos::where('usuario_id', $usuario_id)
+                                    ->where('pago', 1)
+                                    ->sum('valor');
 
         return view('dashboard', 
-        ['listaDeDepositos' => $listaUnificada
-    
-        ,'valorDepositado' => $valorDepositado
+        ['listaDeDepositos' => $listaUnificada,
+        'valorDepositado' => $valorDepositado,
         ]);
     }
 
     public function pagarPorValor($valor){
 
+        
         $deposito = Depositos::where('valor', $valor)->where('pago', 0)->first();
         $Faltam = Depositos::where('pago', 0)->sum('valor');
         
