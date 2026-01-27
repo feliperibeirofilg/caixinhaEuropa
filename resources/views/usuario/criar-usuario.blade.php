@@ -1,30 +1,88 @@
 @extends('layouts.app')
+
 @section('content')
 
-<div class="login-dark">
-        <form method="post" action="{{route('criarUsuario') }}">
+<div class="container login-section">
+    <div class="login-card">
+        
+        <form method="post" action="{{ route('criarUsuario') }}">
             @csrf
-            <h2 class="sr-only">Criar Usuario</h2>
-            <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
-            <div class="form-group">
-                <input class="form-control" type="nome" name="nome" placeholder="Nome">
+
+            {{-- Ícone de Novo Usuário --}}
+            <div class="login-icon">
+                <i class="ion-person-add"></i>
             </div>
-            <div class="form-group">
-                <input class="form-control" type="login" name="login" placeholder="Login">
+
+            <h3 class="mb-4" style="color: #2c3e50; font-weight: 700;">Criar Nova Conta</h3>
+
+            {{-- Exibe erros de validação, se houver --}}
+            @if($errors->any())
+                <div class="alert alert-danger p-2 text-start" style="font-size: 0.9rem; border-radius: 10px;">
+                    <ul class="mb-0 pl-3">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            {{-- Campo Nome --}}
+            <div class="form-group mb-3">
+                <input class="form-control custom-input" 
+                       type="text" 
+                       name="nome" 
+                       placeholder="Nome Completo" 
+                       required>
             </div>
-            <div class="form-group">
-                <input class="form-control" type="telefone" name="telefone" placeholder="Telegram">
+
+            {{-- Campo Login --}}
+            <div class="form-group mb-3">
+                <input class="form-control custom-input" 
+                       type="text" 
+                       name="login" 
+                       placeholder="Escolha seu Login" 
+                       required>
             </div>
-            <div class="form-group">
-                <input class="form-control" type="password" name="password" placeholder="Password">
+
+            {{-- Campo Telefone --}}
+            <div class="form-group mb-3">
+                <input class="form-control custom-input" 
+                       type="tel" 
+                       name="telefone" 
+                       placeholder="Telefone (Telegram)" 
+                       required>
             </div>
+
+            {{-- Campo Senha --}}
+            <div class="form-group mb-4">
+                <input class="form-control custom-input" 
+                       type="password" 
+                       name="password" 
+                       placeholder="Crie uma Senha" 
+                       required>
+            </div>
+
+            {{-- Botão Cadastrar --}}
             <div class="form-group">
-                <button class="btn btn-primary btn-block" type="submit">
-                    Criar Usuario
+                <button class="btn btn-login-submit" type="submit">
+                    Cadastrar <i class="ion-android-send ml-2"></i>
                 </button>
-            </div><a href="#" class="forgot">Esqueceu seu email ou senha?</a>
+            </div>
+
+            {{-- Link para voltar ao Login --}}
+            <div class="login-links">
+                <hr style="width: 50%; margin: 10px auto; opacity: 0.2;">
+                
+                <span>Já possui cadastro?</span>
+                <a href="{{ route('login') }}" class="create-account-link">
+                    Fazer Login
+                </a>
+            </div>
+
         </form>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+</div>
+
+{{-- Removemos os scripts antigos daqui pois já estão no layouts.app --}}
+
 @endsection
