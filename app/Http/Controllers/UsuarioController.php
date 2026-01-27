@@ -49,7 +49,7 @@ class UsuarioController extends Controller
 
         if(Auth::attempt($credenciais)){
             $request->session()->regenerate();
-            return redirect()->route('dashboard');
+            return redirect()->route('caixinha.escolha.form');
         }
         return back()->withErrors(['telefone' => 'Telefone ou senha inválidos'])->withInput();
     }

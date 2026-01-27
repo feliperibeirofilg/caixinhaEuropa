@@ -2,98 +2,61 @@
 
 @section('content')
 
-<div class="container">
+<div class="container py-4">
 
-    {{-- BLOCO DE MENSAGENS --}}
+    {{-- BLOCO DE MENSAGENS (Alertas mais suaves) --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="ion-checkmark-circled mr-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="ion-alert-circled mr-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
 
-    {{-- BLOCO DE TOTAL GERAL (Melhor visualizado em Card do que tabela) --}}
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Total Já Arrecadado</div>
-                <div class="card-body">
-                    <h2 class="card-title">
-                        R$ {{ number_format($valorDepositado, 2, ',', '.') }}
-                    </h2>
+    {{-- 1. TOTAL ACUMULADO (Hero Section) --}}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="balance-card text-center">
+                <div class="card-label">Total Arrecadado</div>
+                <h2>R$ {{ number_format($valorDepositado, 2, ',', '.') }}</h2>
+                <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                    Continue firme rumo à Europa! ✈️
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- TABELA DE RESUMO --}}
-    <h3 class="mt-4">Resumo da Tabela</h3>
-    <table class="table table-bordered table-striped table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>Valor do Depósito</th>
-                <th>Pendentes (Faltam)</th>
-                <th>Realizados (Feitos)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{-- ATENÇÃO: Verifique se no Controller está enviando 'listaDeDepositos' --}}
-            @foreach($listaDeDepositos as $item)
-            <tr>
-                <td><strong>R$ {{ number_format($item->valor, 2, ',', '.') }}</strong></td>
-                
-                {{-- Coluna Pendentes --}}
-                <td style="color: red; font-weight: bold;">
-                    {{ $item->pendentes }}
-                </td>
-
-                {{-- Coluna Feitos --}}
-                <td style="color: green; font-weight: bold;">
-                    {{ $item->feitos }}
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    <hr>
-
-    {{-- CARDS COM BOTÕES DE AÇÃO --}}
-    <h3 class="mt-4">Realizar Depósitos</h3>
+    {{-- 2. GRID DE AÇÃO (Coloquei os cards antes da tabela, pois é a ação principal) --}}
+    <h3 class="section-title"><i class="ion-cash"></i> Realizar Depósitos</h3>
     
     <div class="row">
         @foreach($listaDeDepositos as $item)
-        <div class="col-md-4 mb-4">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h3 class="card-title text-primary">R$ {{ number_format($item->valor, 2, ',', '.') }}</h3>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="deposit-card">
+                <div class="card-body text-center">
+                    <small class="text-uppercase text-muted font-weight-bold">Caixinha de</small>
+                    <div class="deposit-value">R$ {{ number_format($item->valor, 2, ',', '.') }}</div>
                     
-                    {{-- Aqui usamos 'pendentes' que vem do SQL --}}
-                    <p class="card-text">
-                        Restantes: <span class="badge badge-warning" style="font-size: 1rem;">{{ $item->pendentes }}</span>
-                    </p>
+                    <div class="deposit-info">
+                        <span>Faltam:</span>
+                        <span class="badge-count">{{ $item->pendentes }}</span>
+                    </div>
 
                     <form action="{{ route('depositos.pagar', $item->valor) }}" method="POST">
                         @csrf
                         
-                        {{-- O botão desabilita se pendentes for igual a ZERO --}}
-                        <button type="submit" class="btn btn-success btn-block" {{ $item->pendentes == 0 ? 'disabled' : '' }}>
+                        <button type="submit" class="btn-pay" {{ $item->pendentes == 0 ? 'disabled' : '' }}>
                             @if($item->pendentes > 0)
-                                Pagar R$ {{ number_format($item->valor, 2, ',', '.') }}
+                                Pagar Agora <i class="ion-arrow-right-c ml-1"></i>
                             @else
-                                Concluído!
+                                <i class="ion-checkmark-round"></i> Finalizado
                             @endif
                         </button>
                     </form>
@@ -101,6 +64,61 @@
             </div>
         </div>
         @endforeach
+    </div>
+
+    <hr class="my-5" style="opacity: 0.1;">
+
+    {{-- 3. RESUMO DETALHADO (Tabela) --}}
+    <h3 class="section-title"><i class="ion-clipboard"></i> Relatório de Progresso</h3>
+    
+    <div class="table-responsive">
+        <table class="table modern-table">
+            <thead>
+                <tr>
+                    <th>Valor do Depósito</th>
+                    <th class="text-center">Pendentes (A Pagar)</th>
+                    <th class="text-center">Concluídos (Pagos)</th>
+                    <th class="text-end">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($listaDeDepositos as $item)
+                <tr>
+                    <td>
+                        <strong style="color: #2c3e50; font-size: 1.1rem;">
+                            R$ {{ number_format($item->valor, 2, ',', '.') }}
+                        </strong>
+                    </td>
+                    
+                    <td class="text-center">
+                        @if($item->pendentes > 0)
+                            <span class="badge-count">{{ $item->pendentes }}</span>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+
+                    <td class="text-center">
+                         <span class="badge-done">{{ $item->feitos }}</span>
+                    </td>
+
+                    <td class="text-end">
+                        @if($item->pendentes == 0)
+                            <span style="color: #27ae60;"><i class="ion-checkmark-circled"></i> Completo</span>
+                        @else
+                            <div class="progress" style="height: 6px; width: 100px; display: inline-flex;">
+                                @php
+                                    $total = $item->pendentes + $item->feitos;
+                                    $porcentagem = $total > 0 ? ($item->feitos / $total) * 100 : 0;
+                                @endphp
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $porcentagem }}%"></div>
+                            </div>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 
 </div>

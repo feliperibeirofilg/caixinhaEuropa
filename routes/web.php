@@ -18,8 +18,8 @@ Route::post('usuario/login', [UsuarioController::class, 'autenticar'])->name('au
 
 Route::middleware(['auth'])->group(function(){
 //Rota para o usuario escolher o valor do deposito
-Route::get('index', [CaixinhaController::class, 'index'])->name('caixinha.escolha.form');
-Route::post('index', [CaixinhaController::class, 'escolhaCaixinha'])->name('caixinha.escolha');
+Route::get('/', [CaixinhaController::class, 'index'])->name('caixinha.escolha.form');
+Route::get('/processar-escolha', [CaixinhaController::class, 'escolhaCaixinha'])->name('caixinha.escolha');
 Route::get('dashboard', [ControleDepositoController::class, 'totalDepositos'])
 ->name('dashboard');
 // Rotas para os depositos

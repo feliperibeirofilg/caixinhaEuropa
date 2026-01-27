@@ -13,14 +13,16 @@
 </head>
 <body>
     
+   <body>
+    
     <div id="app">
         
         {{-- INICIO DA NAVBAR --}}
         <nav class="custom-navbar">
             {{-- Lado Esquerdo: Logo --}}
-            <a class="navbar-brand" href="{{ url('dashboard') }}">
-            <img src="{{ asset('icon/icon.png') }}" alt="Logo" height="30">
-                Europa Ai Vou eu
+            <a class="navbar-brand" href="{{ url('/') }}">
+                <img src="{{ asset('icon/icon.png') }}" alt="Logo" height="35">
+                <span>Europa Aí Vou Eu</span>
             </a>
 
             {{-- Lado Direito: Menu --}}
@@ -28,26 +30,28 @@
                 
                 @guest
                     @if (Route::has('login'))
-                        <li><a href="{{ route('login') }}">Entrar</a></li>
+                        <li><a href="{{ route('login') }}" class="nav-btn btn-login">Entrar</a></li>
                     @endif
 
                     @if (Route::has('register'))
-                        <li><a href="{{ route('register') }}">Cadastrar</a></li>
+                        <li><a href="{{ route('register') }}" class="nav-btn btn-register">Cadastrar</a></li>
                     @endif
                 
                 @else
                     <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                     
                     <li>
-                        <span style="color: white; opacity: 0.5; margin-right: 10px;">|</span>
-                        <a href="#">Olá, {{ Auth::user()->nome }}</a>
+                        <span style="color: #ccc;">|</span>
                     </li>
 
                     <li>
+                        <span class="user-greeting">Olá, {{ Auth::user()->nome }}</span> </li>
+
+                    <li>
                         <a href="{{ route('logout') }}"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                           style="color: #ff0000ff;">
-                            Sair
+                           class="nav-btn btn-logout"
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="ion-log-out"></i> Sair
                         </a>
 
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -58,11 +62,13 @@
             </ul>
         </nav>
         {{-- FIM DA NAVBAR --}}
-    
-    
 
-<div class="main-content">
-        @yield('content')
+        <div class="main-content">
+            @yield('content')
+        </div>
+
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
