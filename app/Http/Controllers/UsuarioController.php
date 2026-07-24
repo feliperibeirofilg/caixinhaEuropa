@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use App\Services\EnvioEmailService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,25 +16,75 @@ class UsuarioController extends Controller
         return view("usuario.criar-usuario");
     }
 
-    public function criarUsuario(Request $request){
+    public function criarUsuario(Request $request, EnvioEmailService $envioEmailService){
 
-    $request->validate([
-            'nome' => 'required|string|max:255',
-            'login' => 'required|string|unique:usuarios',
-            'telefone' => 'nullable|string|max:255',
-            'admin' => 'boolean',
-            'password' => 'required|string|min:6',
-    ]);
+        $request->validate([
+                'nome' => 'required|string|max:255',
+                'login' => 'required|string|unique:usuarios',
+                'email' => 'required|email|unique:usuarios',
+                'telefone' => 'nullable|string|max:255',
+                'admin' => 'boolean',
+                'password' => 'required|string|min:6',
+        ]);
 
-    Usuario::create([
-        'nome' => $request->nome,
-        'login' => $request->login,
-        'telefone' => $request->telefone,
-        'admin' => $request->boolean('admin'),
-        'password' => Hash::make($request->password),
-    ]);
+        // Cria o usuario mas so loga apos validar o codigo de email
 
-    return redirect()->route('login');
+        $usuario = Usuario::create([
+            'nome' => $request->nome,
+            'login' => $request->login,
+            'email' => $request->email,
+            'telefone' => $request->telefone,
+            'admin' => $request->boolean('admin'),
+            'password' => Hash::make($request->password),
+        ]);
+
+        $token = str_pad((string) random_int(0, 99999), 5, '0', STR_PAD_LEFT);
+
+        $envioEmailService->tokenEmail($usuario, $token);
+
+        $request->session()->put('usuario_verificacao_id', $usuario->id);
+
+        return redirect()->route('usuario.verificar-email');
+    }
+
+    public function formVerificarEmail(Request $request){
+
+        if (!$request->session()->has('usuario_verificacao_id')) {
+            return redirect()->route('formulario');
+        }
+
+        return view('usuario.verificar-email');
+    }
+
+    public function verificarEmail(Request $request){
+
+        $request->validate([
+            'token' => 'required|string|size:5',
+        ]);
+
+        $usuarioId = $request->session()->get('usuario_verificacao_id');
+
+        if (!$usuarioId) {
+            return redirect()->route('formulario');
+        }
+
+        $usuario = Usuario::find($usuarioId);
+
+        if (!$usuario || $usuario->email_verification_token !== $request->token) {
+            return back()->withErrors(['token' => 'Código inválido. Confira o e-mail e tente novamente.']);
+        }
+
+        $usuario->update([
+            'email_verified_at' => now(),
+            'email_verification_token' => null,
+        ]);
+
+        $request->session()->forget('usuario_verificacao_id');
+
+        Auth::login($usuario);
+        $request->session()->regenerate();
+
+        return redirect()->route('caixinha.escolha.form')->with('success', 'Email verificado com sucesso!');
     }
 
     public function login(Request $request){

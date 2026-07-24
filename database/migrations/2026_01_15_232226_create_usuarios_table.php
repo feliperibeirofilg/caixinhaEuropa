@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('nome');
             $table->string('login')->unique();
             $table->boolean('admin')->default(0);
+            $table->string('email')->unique();
+            $table->string('email_verified_at')->nullable();
+            $table->string('email_verification_token')->nullable();
             $table->string('telefone')->nullable();
             $table->string('password');
             $table->rememberToken();

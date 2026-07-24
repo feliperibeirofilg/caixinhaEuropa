@@ -46,10 +46,19 @@
 
             {{-- Campo Telefone --}}
             <div class="form-group mb-3">
-                <input class="form-control custom-input" 
-                       type="tel" 
-                       name="telefone" 
-                       placeholder="Telefone (Telegram)" 
+                <input class="form-control custom-input"
+                       type="tel"
+                       name="telefone"
+                       placeholder="Telefone (Telegram)"
+                       required>
+            </div>
+
+            {{-- Campo Email --}}
+            <div class="form-group mb-3">
+                <input class="form-control custom-input"
+                       type="email"
+                       name="email"
+                       placeholder="Seu Email"
                        required>
             </div>
 

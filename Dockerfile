@@ -1,7 +1,10 @@
 FROM php:8.2-fpm
 
-# 1. Instala dependências do sistema e NODE.JS
-# ADICIONADO: libzip-dev (necessário para a extensão zip do PHP)
+# Argumentos (UID 1000 costuma ser o padrão do seu usuário felipe no WSL/Linux)
+ARG user=felipe
+ARG uid=1000
+
+# Dependências do sistema
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -11,37 +14,26 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    nodejs \
-    npm
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Instala extensões PHP
-# ADICIONADO: zip (O Composer precisa muito disso)
+# Extensões PHP
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
-
-# Instala Redis
 RUN pecl install redis && docker-php-ext-enable redis
 
-# 3. Define a pasta de trabalho
-WORKDIR /var/www
-
-# 4. Copia os arquivos
-COPY . .
-
-# 5. Instala o Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 6. Roda o Composer
-# CORREÇÃO CRÍTICA: Adicionei --no-scripts
-# Isso impede que o Laravel tente rodar comandos antes de estar pronto
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Criar usuário antes de mudar para WORKDIR
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
 
-# 7. Build do Front-end
-RUN npm install
-RUN npm run build
+WORKDIR /var/www
 
-# 8. Ajusta permissões
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# COPIA OS ARQUIVOS COM O DONO CORRETO
+# Isso evita o erro de permissão ao tentar escrever em storage/logs
+COPY --chown=$user:$user . .
 
-# 9. Expõe a porta e Inicia
-EXPOSE 8080
-CMD php artisan serve --host=0.0.0.0 --port=8080
+USER $user
+
+# REATIVADO: Agora ele vai encontrar o composer.json porque está na mesma pasta
+RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts

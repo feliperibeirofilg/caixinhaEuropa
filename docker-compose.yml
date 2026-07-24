@@ -1,76 +1,87 @@
-# version: '3'
 services:
-    # Aplicação Laravel (PHP)
-    cop:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        image: caixinhaeuropa-app
-        container_name: caixinhaeuropa-cop-1
-        restart: unless-stopped
-        working_dir: /var/www/
-        user: "1000:1000"
-        volumes:
-            - ./:/var/www
-        networks:
-            - cop
+  cop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        user: felipe
+        uid: 1000
+    image: controle-financeiro-app
+    container_name: controle-financeiro-cop-1
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - cop
 
-    # Servidor Web (Nginx)
-    nginx:
-        image: nginx:alpine
-        container_name: caixinhaeuropa-nginx-1
-        restart: unless-stopped
-        ports:
-            - "1001:80"
-        volumes:
-            - ./:/var/www
-            - ./docker/nginx/:/etc/nginx/conf.d/
-        networks:
-            - cop
-        depends_on:
-            - cop
+  nginx:
+    image: nginx:alpine
+    container_name: controle-financeiro-nginx-1
+    restart: unless-stopped
+    ports:
+      - "2001:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/:/etc/nginx/conf.d/ # Verifique se o arquivo .conf está aqui
+    networks:
+      - cop
+    depends_on:
+      - cop
 
-    # Banco de Dados (MySQL)
-    db:
-        image: mysql:5.7
-        container_name: caixinhaeuropa-db-1
-        restart: unless-stopped
-        command: --innodb-use-native-aio=0
-        environment:
-            MYSQL_DATABASE: ${DB_DATABASE:-cop}
-            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-            # MYSQL_PASSWORD: ${DB_PASSWORD:-root}
-            # MYSQL_USER: ${DB_USERNAME:-root}
-        volumes:
-            - ./.docker/mysql/dbdata:/var/lib/mysql
-        ports:
-            - "1003:3306"
-        networks:
-            - cop
+  db:
+    image: mysql:8.0
+    container_name: controle-financeiro-db-1
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-cop}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-controle-financeiro}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-p4ssw0rd}
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "2003:3306"
+    networks:
+      - cop
 
-    # PhpMyAdmin
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        container_name: caixinhaeuropa-pma
-        links:
-            - db
-        restart: always
-        environment:
-            PMA_HOST: db
-            PMA_PORT: 3306
-            PMA_ARBITRARY: 1
-        ports:
-            - "1002:80"
-        networks:
-            - cop
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    container_name: controle-financeiro-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - cop
 
-    # Redis
-    redis:
-        image: redis:alpine
-        container_name: caixinhaeuropa-redis-1
-        networks:
-            - cop
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: controle-financeiro-pma
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    ports:
+      - "2002:80"
+    networks:
+      - cop
+    depends_on:
+      - db
+
+  redis:
+    image: redis:alpine
+    container_name: controle-financeiro-redis-1
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - cop
 
 networks:
-    cop:
-        driver: bridge
+  cop:
+    driver: bridge
+
+volumes:
+  dbdata:
+  redisdata:
