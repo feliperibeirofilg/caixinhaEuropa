@@ -16,16 +16,9 @@ class UsuarioController extends Controller
         return view("usuario.criar-usuario");
     }
 
-    public function criarUsuario(Request $request, EnvioEmailService $envioEmailService){
+    public function criarUsuario(UsuarioRequest $request, EnvioEmailService $envioEmailService){
 
-        $request->validate([
-                'nome' => 'required|string|max:255',
-                'login' => 'required|string|unique:usuarios',
-                'email' => 'required|email|unique:usuarios',
-                'telefone' => 'nullable|string|max:255',
-                'admin' => 'boolean',
-                'password' => 'required|string|min:6',
-        ]);
+        $request->validate();
 
         // Cria o usuario mas so loga apos validar o codigo de email
 

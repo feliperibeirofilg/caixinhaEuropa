@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContaMensal;
 use Illuminate\Http\Request;
+use App\Http\Requests\ContaMensalRequest;
 
 class ContaMensalController extends Controller
 {
@@ -17,17 +18,9 @@ class ContaMensalController extends Controller
         return response()->json($contas);
     }
 
-    public function store(Request $request)
+    public function store(ContaMensalRequest $request)
     {
-        $dados = $request->validate([
-            'categoria_id' => 'nullable|exists:categorias,id',
-            'nome' => 'required|string|max:255',
-            'valor_estimado' => 'nullable|numeric|min:0',
-            'dia_vencimento' => 'required|integer|between:1,31',
-            'tipo' => 'sometimes|in:fixa,variavel',
-            'ativa' => 'sometimes|boolean',
-            'observacao' => 'nullable|string',
-        ]);
+        $dados = $request->validate();
 
         $dados['usuario_id'] = auth()->id();
 

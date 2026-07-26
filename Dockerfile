@@ -29,6 +29,8 @@ RUN mkdir -p /home/$user/.composer && \
 
 WORKDIR /var/www
 
+RUN chown $user:$user /var/www
+
 # COPIA OS ARQUIVOS COM O DONO CORRETO
 # Isso evita o erro de permissão ao tentar escrever em storage/logs
 COPY --chown=$user:$user . .

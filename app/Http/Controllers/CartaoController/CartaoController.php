@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cartao;
 use Illuminate\Http\Request;
+use App\Http\Requests\CartaoRequest;
 
 class CartaoController extends Controller
 {
@@ -14,17 +15,9 @@ class CartaoController extends Controller
         return response()->json($cartoes);
     }
 
-    public function store(Request $request)
+    public function store(CartaoRequest $request)
     {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:255',
-            'tipo' => 'required|in:credito,debito',
-            'bandeira' => 'nullable|string|max:255',
-            'limite' => 'nullable|numeric|min:0',
-            'dia_fechamento' => 'nullable|integer|between:1,31',
-            'dia_vencimento' => 'nullable|integer|between:1,31',
-            'ativo' => 'sometimes|boolean',
-        ]);
+        $dados = $request->validate();
 
         $dados['usuario_id'] = auth()->id();
 

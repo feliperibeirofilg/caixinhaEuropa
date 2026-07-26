@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoriaRequest;
 
 class CategoriaController extends Controller
 {
@@ -16,14 +17,9 @@ class CategoriaController extends Controller
         return response()->json($categorias);
     }
 
-    public function store(Request $request)
+    public function store(CategoriaRequest $request)
     {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:255',
-            'tipo' => 'required|in:receita,despesa',
-            'cor' => 'nullable|string|max:7',
-            'icone' => 'nullable|string|max:255',
-        ]);
+        $dados = $request->validate();
 
         $categoria = Categoria::create($dados);
 
