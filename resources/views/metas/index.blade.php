@@ -53,6 +53,21 @@
         </div>
 
     </div>
+
+    <div class="row justify-content-center mt-2">
+        <div class="col-md-8">
+            <div class="option-card" style="border-style:dashed;">
+                <div>
+                    <span class="level-badge" style="background:#f4f0fb;color:#8e44ad;">Personalizada</span>
+                    <div class="option-value" style="color:#8e44ad;font-size:1.6rem;">Crie a sua própria meta</div>
+                    <p class="option-desc">Escolha o nome, o valor e monte você mesmo a distribuição dos depósitos.</p>
+                </div>
+                <a href="{{ route('caixinha.personalizada.form') }}" class="btn-choose" style="background-color:#8e44ad;">
+                    Criar Meta Personalizada
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
-@endsection     
+@endsection

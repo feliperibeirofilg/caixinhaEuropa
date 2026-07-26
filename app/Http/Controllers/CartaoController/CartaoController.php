@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\CartaoController;
 
+use App\Http\Controllers\Controller;
 use App\Models\Cartao;
 use Illuminate\Http\Request;
 use App\Http\Requests\CartaoRequest;
@@ -17,7 +18,7 @@ class CartaoController extends Controller
 
     public function store(CartaoRequest $request)
     {
-        $dados = $request->validate();
+        $dados = $request->validated();
 
         $dados['usuario_id'] = auth()->id();
 

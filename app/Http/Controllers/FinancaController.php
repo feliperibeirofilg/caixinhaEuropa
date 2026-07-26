@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Financa;
+use App\Http\Requests\FinancaRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -28,25 +29,9 @@ class FinancaController extends Controller
         return response()->json($financas);
     }
 
-    public function store(Request $request)
+    public function store(FinancaRequest $request)
     {
-        $dados = $request->validate([
-            'categoria_id' => 'nullable|exists:categorias,id',
-            'cartao_id' => [
-                'nullable',
-                Rule::exists('cartoes', 'id')->where('usuario_id', auth()->id()),
-            ],
-            'descricao' => 'required|string|max:255',
-            'valor' => 'required|numeric|min:0',
-            'tipo' => 'required|in:receita,despesa',
-            'forma_pagamento' => 'required|in:debito,credito,pix,dinheiro,boleto,transferencia',
-            'data_compra' => 'required|date',
-            'parcelas' => 'sometimes|integer|min:1',
-            'parcela_atual' => 'sometimes|integer|min:1',
-            'recorrente' => 'sometimes|boolean',
-            'status' => 'sometimes|in:pendente,pago',
-            'observacao' => 'nullable|string',
-        ]);
+        $dados = $request->validated();
 
         $dados['usuario_id'] = auth()->id();
 

@@ -33,6 +33,55 @@
         </div>
     </div>
 
+    {{-- VISÃO FINANCEIRA GERAL --}}
+    <h3 class="section-title"><i class="ion-stats-bars"></i> Visão Financeira</h3>
+
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="deposit-card"><div class="card-body text-center">
+                <small class="text-uppercase text-muted">Receitas do mês</small>
+                <div class="deposit-value" id="dashReceitas" style="color:#27ae60;">R$ 0,00</div>
+            </div></div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="deposit-card"><div class="card-body text-center">
+                <small class="text-uppercase text-muted">Despesas do mês</small>
+                <div class="deposit-value" id="dashDespesas" style="color:#e74c3c;">R$ 0,00</div>
+            </div></div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="deposit-card"><div class="card-body text-center">
+                <small class="text-uppercase text-muted">Saldo do mês</small>
+                <div class="deposit-value" id="dashSaldo">R$ 0,00</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-7 mb-4">
+            <div class="chart-card">
+                <h5><i class="ion-android-chart"></i> Receitas x Despesas (últimos 6 meses)</h5>
+                <canvas id="graficoEvolucao" height="220"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-4">
+            <div class="chart-card">
+                <h5><i class="ion-pie-graph"></i> Despesas por categoria (mês atual)</h5>
+                <canvas id="graficoCategorias" height="220"></canvas>
+                <p id="semDespesasCategorias" class="text-muted text-center mt-3 d-none">Sem despesas registradas neste mês.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="chart-card">
+                <h5><i class="ion-calendar"></i> Contas mensais ativas</h5>
+                <div id="listaContasDashboard" class="small text-muted text-center py-3">Carregando...</div>
+            </div>
+        </div>
+    </div>
+
     {{-- 2. GRID DE AÇÃO (Coloquei os cards antes da tabela, pois é a ação principal) --}}
     <h3 class="section-title"><i class="ion-cash"></i> Realizar Depósitos</h3>
     
@@ -123,4 +172,133 @@
 
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const coresCategorias = ['#27ae60', '#2563eb', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+
+    function carregarVisaoFinanceira() {
+        window.apiFetch('/financas').then((financas) => {
+            renderizarTilesMes(financas);
+            renderizarGraficoEvolucao(financas);
+            renderizarGraficoCategorias(financas);
+        }).catch(() => {});
+
+        window.apiFetch('/contas-mensais').then((contas) => renderizarContasDashboard(contas)).catch(() => {});
+    }
+
+    function renderizarTilesMes(financas) {
+        const hoje = new Date();
+        const doMes = financas.filter((f) => {
+            const data = new Date(f.data_compra + 'T00:00:00');
+            return data.getMonth() === hoje.getMonth() && data.getFullYear() === hoje.getFullYear();
+        });
+
+        let receitas = 0;
+        let despesas = 0;
+        doMes.forEach((f) => {
+            if (f.tipo === 'receita') receitas += Number(f.valor);
+            else despesas += Number(f.valor);
+        });
+
+        document.getElementById('dashReceitas').textContent = window.formatarMoeda(receitas);
+        document.getElementById('dashDespesas').textContent = window.formatarMoeda(despesas);
+        document.getElementById('dashSaldo').textContent = window.formatarMoeda(receitas - despesas);
+    }
+
+    function renderizarGraficoEvolucao(financas) {
+        const hoje = new Date();
+        const labels = [];
+        const receitasPorMes = [];
+        const despesasPorMes = [];
+
+        for (let i = 5; i >= 0; i--) {
+            const referencia = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+            labels.push(`${meses[referencia.getMonth()]}/${String(referencia.getFullYear()).slice(2)}`);
+
+            const doMes = financas.filter((f) => {
+                const data = new Date(f.data_compra + 'T00:00:00');
+                return data.getMonth() === referencia.getMonth() && data.getFullYear() === referencia.getFullYear();
+            });
+
+            receitasPorMes.push(doMes.filter((f) => f.tipo === 'receita').reduce((s, f) => s + Number(f.valor), 0));
+            despesasPorMes.push(doMes.filter((f) => f.tipo === 'despesa').reduce((s, f) => s + Number(f.valor), 0));
+        }
+
+        new Chart(document.getElementById('graficoEvolucao'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'Receitas', data: receitasPorMes, backgroundColor: '#27ae60', borderRadius: 6 },
+                    { label: 'Despesas', data: despesasPorMes, backgroundColor: '#e74c3c', borderRadius: 6 },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true } },
+            },
+        });
+    }
+
+    function renderizarGraficoCategorias(financas) {
+        const hoje = new Date();
+        const despesasDoMes = financas.filter((f) => {
+            const data = new Date(f.data_compra + 'T00:00:00');
+            return f.tipo === 'despesa' && data.getMonth() === hoje.getMonth() && data.getFullYear() === hoje.getFullYear();
+        });
+
+        if (!despesasDoMes.length) {
+            document.getElementById('semDespesasCategorias').classList.remove('d-none');
+            return;
+        }
+
+        const totaisPorCategoria = {};
+        despesasDoMes.forEach((f) => {
+            const nome = f.categoria ? f.categoria.nome : 'Sem categoria';
+            totaisPorCategoria[nome] = (totaisPorCategoria[nome] || 0) + Number(f.valor);
+        });
+
+        new Chart(document.getElementById('graficoCategorias'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(totaisPorCategoria),
+                datasets: [{ data: Object.values(totaisPorCategoria), backgroundColor: coresCategorias }],
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } },
+            },
+        });
+    }
+
+    function renderizarContasDashboard(contas) {
+        const alvo = document.getElementById('listaContasDashboard');
+        const ativas = contas.filter((c) => c.ativa);
+
+        if (!ativas.length) {
+            alvo.innerHTML = '<p class="text-muted">Nenhuma conta mensal cadastrada.</p>';
+            return;
+        }
+
+        alvo.innerHTML = `<div class="table-responsive"><table class="table modern-table mb-0">
+            <thead><tr><th>Nome</th><th>Categoria</th><th class="text-center">Vencimento</th><th class="text-end">Valor estimado</th></tr></thead>
+            <tbody>
+                ${ativas.sort((a, b) => a.dia_vencimento - b.dia_vencimento).map((c) => `
+                    <tr>
+                        <td>${c.nome}</td>
+                        <td>${c.categoria ? c.categoria.nome : '-'}</td>
+                        <td class="text-center">Dia ${c.dia_vencimento}</td>
+                        <td class="text-end">${c.valor_estimado ? window.formatarMoeda(c.valor_estimado) : '-'}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table></div>`;
+    }
+
+    carregarVisaoFinanceira();
+</script>
 @endsection

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\CategoriaController;
 
+use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 use App\Http\Requests\CategoriaRequest;
@@ -19,7 +20,7 @@ class CategoriaController extends Controller
 
     public function store(CategoriaRequest $request)
     {
-        $dados = $request->validate();
+        $dados = $request->validated();
 
         $categoria = Categoria::create($dados);
 

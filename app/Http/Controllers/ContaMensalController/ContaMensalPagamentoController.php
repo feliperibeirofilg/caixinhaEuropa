@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ContaMensalController;
 
+use App\Http\Controllers\Controller;
 use App\Models\ContaMensal;
 use App\Models\ContaMensalPagamento;
 use Illuminate\Http\Request;

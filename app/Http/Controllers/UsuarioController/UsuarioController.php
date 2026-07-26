@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UsuarioController;
 
+use App\Http\Requests\UsuarioRequest;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Services\EnvioEmailService;
@@ -17,8 +19,6 @@ class UsuarioController extends Controller
     }
 
     public function criarUsuario(UsuarioRequest $request, EnvioEmailService $envioEmailService){
-
-        $request->validate();
 
         // Cria o usuario mas so loga apos validar o codigo de email
 
@@ -87,14 +87,24 @@ class UsuarioController extends Controller
     public function autenticar(Request $request){
 
         $credenciais = $request->validate([
-            'telefone' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
         if(Auth::attempt($credenciais)){
             $request->session()->regenerate();
-            return redirect()->route('caixinha.escolha.form');
+
+            if(!Auth::user()->caixinha_id){
+                return redirect()->route('caixinha.escolha.form');
+            }
+
+            return redirect()->route('inicio');
         }
-        return back()->withErrors(['telefone' => 'Telefone ou senha inválidos'])->withInput();
+        return back()->withErrors(['email' => 'E-mail ou senha inválidos'])->withInput();
+    }
+
+    public function logout(){
+        Auth::logout();
+        return redirect()->route('usuario.login');
     }
 }

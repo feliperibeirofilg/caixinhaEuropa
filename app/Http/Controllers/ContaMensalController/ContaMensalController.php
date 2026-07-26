@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ContaMensalController;
 
+use App\Http\Controllers\Controller;
 use App\Models\ContaMensal;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContaMensalRequest;
@@ -20,7 +21,7 @@ class ContaMensalController extends Controller
 
     public function store(ContaMensalRequest $request)
     {
-        $dados = $request->validate();
+        $dados = $request->validated();
 
         $dados['usuario_id'] = auth()->id();
 

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\CartaoController;
 
+use App\Http\Controllers\Controller;
 use App\Models\Cartao;
 use App\Models\FaturaCartao;
 use Illuminate\Http\Request;

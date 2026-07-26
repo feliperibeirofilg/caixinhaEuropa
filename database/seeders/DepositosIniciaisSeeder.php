@@ -43,15 +43,15 @@ class DepositosIniciaisSeeder extends Seeder
         $agora = Carbon::now();
 
         $dadosParaInserir = [
-            ['nome' => 'Iniciante R$ 1000,00', 
-            'meta_valor' => 1000.00, 
-            'quantidade' => json_encode($listaDeDepositos10000)],
+            ['nome' => 'Iniciante R$ 1000,00',
+            'meta_valor' => 1000.00,
+            'quantidade' => json_encode($listaDeDepositos1000)],
             ['nome' => 'Média R$ 5000,00',
-             'meta_valor' => 5000.00, 
+             'meta_valor' => 5000.00,
              'quantidade' => json_encode($listaDeDepositos5000)],
             ['nome' => 'Difícil R$ 10000,00',
-             'meta_valor' => 10000.00, 
-             'quantidade' => json_encode($listaDeDepositos1000)],
+             'meta_valor' => 10000.00,
+             'quantidade' => json_encode($listaDeDepositos10000)],
         ];
        
 

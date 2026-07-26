@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\TransferenciaController;
 
+use App\Http\Requests\TransferenciaRequest;
+use App\Http\Controllers\Controller;
 use App\Models\Transferencia;
 use Illuminate\Http\Request;
+
 
 class TransferenciaController extends Controller
 {

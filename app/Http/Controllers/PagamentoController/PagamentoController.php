@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\PagamentoController;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PagamentoRequest;
 use App\Models\Pagamento;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -18,20 +20,9 @@ class PagamentoController extends Controller
         return response()->json($pagamentos);
     }
 
-    public function store(Request $request)
+    public function store(PagamentoRequest $request)
     {
-        $dados = $request->validate([
-            'fatura_cartao_id' => [
-                'nullable',
-                Rule::exists('faturas_cartao', 'id')->where(function ($query) {
-                    $query->whereIn('cartao_id', auth()->user()->cartoes()->pluck('id'));
-                }),
-            ],
-            'valor' => 'required|numeric|min:0',
-            'data_pagamento' => 'required|date',
-            'forma_pagamento' => 'nullable|in:pix,debito,boleto,dinheiro',
-            'observacao' => 'nullable|string',
-        ]);
+        $dados = $request->validated();
 
         $dados['usuario_id'] = auth()->id();
 
